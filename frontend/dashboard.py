@@ -1,26 +1,15 @@
+import os
 import streamlit as st
 import pandas as pd
 import requests
 import plotly.express as px
 import plotly.graph_objects as go
-import sys
-import os
 
-# Parse API URL from command line arguments
-# Streamlit command: streamlit run dashboard.py -- --api-url http://localhost:8000
-API_BASE_URL = "http://localhost:8000"  # Default value
+API_URL = os.getenv("API_URL")
 
-# Check for --api-url argument in sys.argv
-if "--api-url" in sys.argv:
-    try:
-        api_url_index = sys.argv.index("--api-url")
-        if api_url_index + 1 < len(sys.argv):
-            API_BASE_URL = sys.argv[api_url_index + 1]
-    except (ValueError, IndexError):
-        pass
-
-# Also check environment variable as fallback
-API_BASE_URL = os.getenv("API_BASE_URL", API_BASE_URL)
+if not API_URL:
+    st.error("API_URL environment variable not set")
+    st.stop()
 
 # Page config
 st.set_page_config(
@@ -40,14 +29,14 @@ page = st.sidebar.radio("Select Page", ["Overview", "Beneficiaries", "Risk Analy
 # Display API URL in sidebar
 st.sidebar.markdown("---")
 st.sidebar.markdown("**API Configuration**")
-st.sidebar.info(f"API URL: `{API_BASE_URL}`")
+st.sidebar.info(f"API URL: `{API_URL}`")
 
 # Helper function to fetch data
 @st.cache_data(ttl=60)
 def fetch_results():
     """Fetch all results from API."""
     try:
-        response = requests.get(f"{API_BASE_URL}/results")
+        response = requests.get(f"{API_URL}/results")
         if response.status_code == 200:
             data = response.json()
             return pd.DataFrame(data["data"])
@@ -55,15 +44,13 @@ def fetch_results():
             st.error(f"API Error: {response.status_code}")
             return None
     except requests.exceptions.ConnectionError:
-        st.error(f"⚠️ Cannot connect to API at `{API_BASE_URL}`. Make sure the API server is running:")
-        st.code("uvicorn src.api.main:app --reload", language="bash")
-        st.info(f"💡 Tip: You can specify a different API URL using: `streamlit run dashboard.py -- --api-url <URL>`")
+        st.error(f"⚠️ Cannot connect to API at `{API_URL}`. Make sure the API server is running.")
         return None
 
 def fetch_explanation(beneficiary_id):
     """Fetch explanation for a beneficiary."""
     try:
-        response = requests.get(f"{API_BASE_URL}/explain/{beneficiary_id}")
+        response = requests.get(f"{API_URL}/explain/{beneficiary_id}")
         if response.status_code == 200:
             return response.json()
         else:
