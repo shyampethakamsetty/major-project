@@ -61,3 +61,4 @@ def apply_rules(df):
     df["rule_score"] = scores
     return df
 
+

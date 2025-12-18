@@ -254,3 +254,4 @@ elif page == "Explain Risk":
 st.markdown("---")
 st.markdown("**Fraud Detection System** | Built with Streamlit & FastAPI")
 
+

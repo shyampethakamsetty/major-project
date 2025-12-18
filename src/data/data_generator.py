@@ -137,3 +137,4 @@ if __name__ == "__main__":
     print(f"Fraud cases: {df['is_fraud'].sum()} ({df['is_fraud'].mean()*100:.1f}%)")
     print(f"Saved to data/raw/beneficiaries.csv")
 
+

@@ -76,3 +76,4 @@ class AnomalyDetector:
         self.fit(X)
         return self.predict(X)
 
+

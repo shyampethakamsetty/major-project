@@ -31,3 +31,4 @@ def calculate_metrics(df, y_true_col="is_fraud", y_pred_col="risk_level"):
         "note": "Simulated evaluation with synthetic labels"
     }
 
+

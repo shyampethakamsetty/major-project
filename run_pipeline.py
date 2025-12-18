@@ -103,3 +103,4 @@ if __name__ == "__main__":
     print(f"Medium risk: {(df['risk_level'] == 'MEDIUM').sum()}")
     print(f"Low risk: {(df['risk_level'] == 'LOW').sum()}")
 
+

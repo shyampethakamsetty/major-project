@@ -71,3 +71,4 @@ streamlit run frontend/dashboard.py
 - `POST /predict` - Predict risk for a single beneficiary
 - `GET /health` - Health check
 
+
