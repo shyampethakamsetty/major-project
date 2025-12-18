@@ -3,6 +3,24 @@ import pandas as pd
 import requests
 import plotly.express as px
 import plotly.graph_objects as go
+import sys
+import os
+
+# Parse API URL from command line arguments
+# Streamlit command: streamlit run dashboard.py -- --api-url http://localhost:8000
+API_BASE_URL = "http://localhost:8000"  # Default value
+
+# Check for --api-url argument in sys.argv
+if "--api-url" in sys.argv:
+    try:
+        api_url_index = sys.argv.index("--api-url")
+        if api_url_index + 1 < len(sys.argv):
+            API_BASE_URL = sys.argv[api_url_index + 1]
+    except (ValueError, IndexError):
+        pass
+
+# Also check environment variable as fallback
+API_BASE_URL = os.getenv("API_BASE_URL", API_BASE_URL)
 
 # Page config
 st.set_page_config(
@@ -11,9 +29,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# API base URL
-API_BASE_URL = "http://localhost:8000"
-
 # Title
 st.title("🚨 Fraud Detection Dashboard")
 st.markdown("---")
@@ -21,6 +36,11 @@ st.markdown("---")
 # Sidebar
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Select Page", ["Overview", "Beneficiaries", "Risk Analysis", "Explain Risk"])
+
+# Display API URL in sidebar
+st.sidebar.markdown("---")
+st.sidebar.markdown("**API Configuration**")
+st.sidebar.info(f"API URL: `{API_BASE_URL}`")
 
 # Helper function to fetch data
 @st.cache_data(ttl=60)
@@ -35,8 +55,9 @@ def fetch_results():
             st.error(f"API Error: {response.status_code}")
             return None
     except requests.exceptions.ConnectionError:
-        st.error("⚠️ Cannot connect to API. Make sure the API server is running:")
+        st.error(f"⚠️ Cannot connect to API at `{API_BASE_URL}`. Make sure the API server is running:")
         st.code("uvicorn src.api.main:app --reload", language="bash")
+        st.info(f"💡 Tip: You can specify a different API URL using: `streamlit run dashboard.py -- --api-url <URL>`")
         return None
 
 def fetch_explanation(beneficiary_id):
